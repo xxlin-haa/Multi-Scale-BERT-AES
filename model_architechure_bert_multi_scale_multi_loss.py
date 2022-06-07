@@ -24,7 +24,7 @@ class DocumentBertScoringModel():
         self.config = config
         self.prompt = int(args.prompt[1])
         chunk_sizes_str = self.args['chunk_sizes']
-        self.chunk_sizes = []
+        self.chunk_sizes = [] # size of chunks for each segment scale
         self.bert_batch_sizes = []
         if "0" != chunk_sizes_str:
             for chunk_size_str in chunk_sizes_str.split("_"):
@@ -74,7 +74,7 @@ class DocumentBertScoringModel():
                 batch_predictions_word_document = torch.squeeze(batch_predictions_word_document)
 
                 batch_predictions_word_chunk_sentence_doc = batch_predictions_word_document
-                # segment-scale representations
+                # segment-scale representations (each iteration processes one segment scale)
                 for chunk_index in range(len(self.chunk_sizes)):
                     batch_document_tensors_chunk = document_representations_chunk_list[chunk_index][i:i + self.args['batch_size']].to(
                         device=self.args['device'])
