@@ -24,7 +24,7 @@ class DocumentBertScoringModel():
         self.config = config
         self.prompt = int(args.prompt[1])
         chunk_sizes_str = self.args['chunk_sizes']
-        self.chunk_sizes = []
+        self.chunk_sizes = [] # what is this?
         self.bert_batch_sizes = []
         if "0" != chunk_sizes_str:
             for chunk_size_str in chunk_sizes_str.split("_"):
