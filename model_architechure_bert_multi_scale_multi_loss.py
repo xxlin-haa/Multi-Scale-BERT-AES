@@ -68,11 +68,13 @@ class DocumentBertScoringModel():
         with torch.no_grad():
             predictions = torch.empty((document_representations_word_document.shape[0]))
             for i in range(0, document_representations_word_document.shape[0], self.args['batch_size']):
+                # token-scale representations
                 batch_document_tensors_word_document = document_representations_word_document[i:i + self.args['batch_size']].to(device=self.args['device'])
                 batch_predictions_word_document = self.bert_regression_by_word_document(batch_document_tensors_word_document, device=self.args['device'])
                 batch_predictions_word_document = torch.squeeze(batch_predictions_word_document)
 
                 batch_predictions_word_chunk_sentence_doc = batch_predictions_word_document
+                # segment-scale representations
                 for chunk_index in range(len(self.chunk_sizes)):
                     batch_document_tensors_chunk = document_representations_chunk_list[chunk_index][i:i + self.args['batch_size']].to(
                         device=self.args['device'])
@@ -82,6 +84,7 @@ class DocumentBertScoringModel():
                         bert_batch_size=self.bert_batch_sizes[chunk_index]
                     )
                     batch_predictions_chunk = torch.squeeze(batch_predictions_chunk)
+                    # sum up the representations
                     batch_predictions_word_chunk_sentence_doc = torch.add(batch_predictions_word_chunk_sentence_doc, batch_predictions_chunk)
                 predictions[i:i + self.args['batch_size']] = batch_predictions_word_chunk_sentence_doc
         assert correct_output.shape == predictions.shape
